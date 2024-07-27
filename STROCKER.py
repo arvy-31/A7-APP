@@ -31,6 +31,16 @@ def display_stock_data(ticker, period):
     st.write("### Changes")
     st.dataframe(data[['Change']])
 
+# Function to create line charts with adjusted Y-axis range
+def create_line_chart(data, title):
+    fig = go.Figure(data=[go.Scatter(x=data.index, y=data['Close'], mode='lines')])
+    fig.update_layout(title=title, xaxis_title='Date', yaxis_title='Price')
+    # Set Y-axis range
+    min_y = data['Close'].min() * 0.95
+    max_y = data['Close'].max() * 1.05
+    fig.update_yaxes(range=[min_y, max_y])
+    return fig
+
 # Sidebar for user input
 st.sidebar.header("Stock Tracker")
 ticker = st.sidebar.text_input("Enter Stock Ticker", value='AAPL')
@@ -52,7 +62,8 @@ for i, (name, index) in enumerate(indices.items()):
         st.write(f"### {name}")
         index_data = yf.Ticker(index).history(period='1mo')
         if not index_data.empty:
-            st.line_chart(index_data['Close'])
+            fig = create_line_chart(index_data, f'{name} (Last 30 Days)')
+            st.plotly_chart(fig)
         else:
             st.write("Data not available")
 
