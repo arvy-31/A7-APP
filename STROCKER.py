@@ -25,9 +25,13 @@ st.markdown(
 )
 
 # Function to fetch and display stock data
-def display_stock_data(ticker, period):
+@st.cache
+def fetch_stock_data(ticker, period):
     stock = yf.Ticker(ticker)
-    data = stock.history(period=period)
+    return stock.history(period=period)
+
+def display_stock_data(ticker, period):
+    data = fetch_stock_data(ticker, period)
     
     st.write(f"### {ticker} Stock Data")
     
@@ -70,10 +74,14 @@ st.write("### Market Indices")
 indices = {'Nifty 50': '^NSEI', 'Sensex': '^BSESN', 'USD/INR': 'INR=X'}
 cols = st.columns(len(indices))
 
+@st.cache
+def fetch_index_data(index):
+    return yf.Ticker(index).history(period='1d')
+
 for i, (name, index) in enumerate(indices.items()):
     with cols[i]:
         st.write(f"### {name}")
-        index_data = yf.Ticker(index).history(period='1d')
+        index_data = fetch_index_data(index)
         fig_index = px.line(index_data, x=index_data.index, y='Close', title=f'{name} Line Chart', labels={'Close': 'Price'})
         fig_index.update_traces(line_color='green')
         st.plotly_chart(fig_index)
