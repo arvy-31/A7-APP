@@ -43,14 +43,14 @@ if ticker:
     display_stock_data(ticker, period)
 
 # Nifty 50, Sensex, and USD/INR changes
-st.write("### Market Indices")
+st.write("### Market Indices (Last 30 Days)")
 indices = {'Nifty 50': '^NSEI', 'Sensex': '^BSESN', 'USD/INR': 'INR=X'}
 cols = st.columns(len(indices))
 
 for i, (name, index) in enumerate(indices.items()):
     with cols[i]:
         st.write(f"### {name}")
-        index_data = yf.Ticker(index).history(period='1d')
+        index_data = yf.Ticker(index).history(period='1mo')
         if not index_data.empty:
             st.line_chart(index_data['Close'])
         else:
